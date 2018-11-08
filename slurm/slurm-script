@@ -1,10 +1,10 @@
 #!/bin/bash -l
-#SBATCH -p parallel
-#SBATCH --constraint=snb  # hsw for Haswell snb for Sandy bridge
-#SBATCH --nodes 1         # for SMP only 1 is possible
+#SBATCH -p test    # the name of the pool
+##SBATCH --constraint=cputype
+#SBATCH --nodes 1         
 #SBATCH --ntasks-per-node=16 # Tasks per node
 #SBATCH --ntasks 16      # total number of cores (processes)
-#SBATCH -t 24:00:00        # time as hh:mm:ss
+#SBATCH -t 00:02:00        # time as hh:mm:ss
 #SBATCH -J title     
 #SBATCH -e jobfile.err%J
 #SBATCH -o jobfile.out%J
