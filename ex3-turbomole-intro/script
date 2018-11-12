@@ -1,0 +1,53 @@
+#!/bin/bash -l
+#SBATCH -p test     
+#SBATCH --nodes 1         # for SMP only 1 is possible
+#SBATCH --ntasks-per-node=16 # Tasks per node
+#SBATCH --ntasks 16      # total number of cores (processes)
+#SBATCH -t 00:30:00        # time as hh:mm:ss
+#SBATCH -J turbomole 
+#SBATCH -e jobfile.err%J
+#SBATCH -o jobfile.out%J
+#SBATCH --mem-per-cpu=200
+##SBATCH --mail-type=END  # remove the first hash symbol of this line and the one below to activate them
+##SBATCH --mail-user=your_email                 
+SDIR=`pwd`
+#
+# activate one of the two lines below in order to sellect
+# the type of parallelization. aoforce, escf and egrad works only 
+# with SMP (within a single node).    
+#  
+export PARA_ARCH=MPI
+#export PARA_ARCH=SMP
+#
+export PARNODES=$SLURM_NPROCS
+module load turbomole
+export PATH=$TURBODIR/bin/`$TURBODIR/scripts/sysname`:$PATH
+# use the local disks for scratch. If that disk space is not enough
+# redefine TURBOTMPDIR to point to the Lustre parallel disk under /wrk like
+# export TURBOTMPDIR=$WRKDIR/$USER/TURBOTMPDIR.$SLURM_JOB_ID
+# mkdir -p $TURBOTMPDIR
+#
+export TURBOTMPDIR=/tmp/$USER/$SLURM_JOB_ID/turbotmpdir
+#
+# remove possible earlier $tmpdir from control file
+kdg tmpdir
+# 
+export HOSTS_FILE=$SDIR/turbomole.machines
+rm -f $HOSTS_FILE
+srun hostname > $HOSTS_FILE
+cat $HOSTS_FILE
+#
+# set Platform MPI to run in SLURM compatible mode
+#  
+export MPI_USESRUN=1 
+# start job
+actual -r
+/usr/bin/time -v  dscf > dscf.out
+#/usr/bin/time -v  ridft > ridft.out
+#/usr/bin/time -v jobex -c 500 > jobex.out
+#/usr/bin/time -v jobex -ri -c 500 > jobex.out
+#/usr/bin/time -v  mpshift > mpshift.out
+#/usr/bin/time -v  ricc2 > ricc2.out
+# print som info like used time, disk, reserved memory and actual used memory
+sacct -a --format=elapsed,maxdiskwrite,reqmem,maxrss  -j $SLURM_JOB_ID
+
