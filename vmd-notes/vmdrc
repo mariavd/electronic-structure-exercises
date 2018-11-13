@@ -1,0 +1,383 @@
+############################################################################
+#cr                                                                       
+#cr            (C) Copyright 1995-2007 The Board of Trustees of the            
+#cr                        University of Illinois                         
+#cr                         All Rights Reserved                           
+#cr                                                                       
+############################################################################
+
+############################################################################
+# RCS INFORMATION:
+#
+#       $RCSfile: .vmdrc,v $
+#       $Author: johns $        $Locker:  $                $State: Exp $
+#       $Revision: 1.9 $      $Date: 2007/01/12 20:12:44 $
+#
+############################################################################
+# DESCRIPTION:
+#
+# VMD startup script.  The commands here are executed as soon as VMD starts up
+############################################################################
+
+# turn on lights 0 and 1
+light 0 on
+light 1 on
+light 2 off
+light 3 off
+
+# position the stage and axes
+#axes location lowerleft
+axes location off
+stage location off
+display projection orthographic
+display rendermode GLSL
+
+display resize 1000 1000
+display reposition 800 1200
+
+# position and turn on menus
+menu main     move 5   900
+menu display move 386 90
+menu graphics move 395 500
+menu color    move 125 525
+menu files    move 125 600
+menu labels   move 125 525
+menu render   move 125 525
+
+menu main      on
+#menu display  on
+#menu graphics on
+#menu color    on
+#menu labels   on
+#menu render   on
+#menu files    on
+
+# start the scene a-rockin'
+# rock y by 1
+
+# User's default values for newly loaded molecules/reps, etc
+#  mol default color {colorID 5}
+#  mol default style {NewCartoon 0.300000 6.000000 4.100000 0}
+#  mol default selection {name CA}
+#  mol default material {Transparent}
+# CPK: sphere_scale then bond_radius then sphere_resolution then bond_resolution
+mol default style {CPK 0.600000 0.300000 50.000000 50.000000}
+mol default color {Element}
+
+##########################################
+#  										 #
+#      COLOURS 							 #
+#  										 #
+##########################################
+
+color Display {Background} white
+color Labels {Bonds} red
+color Labels {Angles} blue
+color Element {C} black
+color Element {B} pink
+color Element {N} blue3
+color Element {Cl} green2
+color Element {Xe} yellow
+color Element {Fe} yellow
+color Element {Ne} cyan2
+color Element {Ar} green2
+color Element {Mg} green3
+color Element {Li} magenta
+color Element {Si} silver
+color Element {Cu} red3
+color Element {F} yellow2
+color Element {Br} ochre
+
+# blue3 
+color change rgb 24 0.0 0.15 1.0 
+# green2 
+color change rgb 19 0.0 0.90 0.04 
+# pink
+color change rgb 9 1.0 0.72 0.62 
+# red3
+color change rgb 30 0.7 0.0 0.0 
+# yellow2
+color change rgb 17 0.8 1.0 0.16
+# ochre 
+color change rgb 14 0.5 0.1 0.0 
+
+##########################################
+#  										 #
+#      SHORTCUT KEYS 					 #
+#										 #
+##########################################
+
+
+user add key {>} {
+	#goes to the next animation frame
+	animate next
+	animate pause
+}
+
+user add key {<} {
+	#goes to the next animation frame
+	animate prev
+	animate pause
+}
+
+user add key m {
+	#Moves geometry center of the molecule to the origin
+	[atomselect top all] moveby [vecscale -1.0 [measure center [atomselect top all]]]
+}
+
+##########################################
+#  										 #
+#         PROCEDURES 					 #
+#										 #
+##########################################
+
+proc box_molecule {molid} {
+      # get the min and max values for each of the directions
+      # (I'm not sure if this is the best way ... )
+      set sel [atomselect top all]
+set coords [lsort -real [$sel get x]]
+      set minx [lindex $coords 0]
+      set maxx [lindex [lsort -real -decreasing $coords] 0]
+
+      set coords [lsort -real [$sel get y]]
+      set miny [lindex $coords 0]
+      set maxy [lindex [lsort -real -decreasing $coords] 0]
+
+      set coords [lsort -real [$sel get z]]
+      set minz [lindex $coords 0]
+      set maxz [lindex [lsort -real -decreasing $coords] 0]
+
+      # and draw the lines
+      draw materials off
+      draw color black
+      draw line "$minx $miny $minz" "$maxx $miny $minz" width 3
+      draw line "$minx $miny $minz" "$minx $maxy $minz" width 3
+      draw line "$minx $miny $minz" "$minx $miny $maxz" width 3
+
+	  
+	  
+      draw line "$maxx $miny $minz" "$maxx $maxy $minz" width 3
+      draw line "$maxx $miny $minz" "$maxx $miny $maxz" width 3
+
+      draw line "$minx $maxy $minz" "$maxx $maxy $minz" width 3
+      draw line "$minx $maxy $minz" "$minx $maxy $maxz" width 3
+
+      draw line "$minx $miny $maxz" "$maxx $miny $maxz" width 3
+      draw line "$minx $miny $maxz" "$minx $maxy $maxz" width 3
+
+      draw line "$maxx $maxy $maxz" "$maxx $maxy $minz" width 3
+      draw line "$maxx $maxy $maxz" "$minx $maxy $maxz" width 3
+      draw line "$maxx $maxy $maxz" "$maxx $miny $maxz" width 3
+}
+
+#############################################################
+#       		USE: intplanes  		 					#
+#############################################################
+
+
+#for {set molid 0} { $molid < $nmol} {incr molid} {
+#proc intplanes {nmol} {
+
+proc intplanes {} {
+
+set loadedMolecules [molinfo list]
+
+foreach molid $loadedMolecules {
+
+    mol showrep $molid 0 off
+    mol modselect 0 $molid "all not element X Be"
+    set xel [atomselect $molid "element X"]
+    set coords [$xel get index]
+
+    for {set i 0} {$i < 4} {incr i} {
+         lassign $coords i1 i2 i3 i4
+        }
+
+    set c1 [atomselect $molid "index $i1"]
+    set c2 [atomselect $molid "index $i2"]
+    set c3 [atomselect $molid "index $i3"]
+    set c4 [atomselect $molid "index $i4"]
+
+        lassign [$c1 get {x y z}] pos1
+        lassign [$c2 get {x y z}] pos2
+        lassign [$c3 get {x y z}] pos3
+        lassign [$c4 get {x y z}] pos4
+
+        draw color red
+		set LINEWIDTH 6
+        draw line $pos1 $pos2 width $LINEWIDTH
+        draw line $pos3 $pos4 width $LINEWIDTH
+        draw line $pos1 $pos3 width $LINEWIDTH
+        draw line $pos2 $pos4 width $LINEWIDTH
+		
+		set posHalf1 [ vecscale 0.5 [ vecadd $pos1 $pos2 ] ]
+		set posHalf2 [ vecscale 0.5 [ vecadd $pos3 $pos4 ] ]
+		
+		set LINEWIDTH 3 
+		draw line $posHalf1 $posHalf2 width $LINEWIDTH
+}
+
+# CPK: sphere_scale then bond_radius then sphere_resolution then bond_resolution
+mol representation CPK 0.600000 0.300000 50.000000 50.000000
+mol color Element
+mol material Opaque
+mol addrep $molid
+mol modselect 1 $molid "all not element X Be"
+}
+
+#############################################################
+#       		USE: remove_long_bonds 3 					#
+#############################################################
+
+proc remove_long_bonds { max_length } {
+    for { set i 0 } { $i < [ molinfo top get numatoms ] } { incr i } {
+        set bead [ atomselect top "index $i" ]
+        set bonds [ lindex [$bead getbonds] 0 ]
+
+        if { [ llength bonds ] > 0 } {
+            set bonds_new {}
+            set xyz [ lindex [$bead get {x y z}] 0 ]
+
+            foreach j $bonds {
+                set bead_to [ atomselect top "index $j" ]
+                set xyz_to [ lindex [$bead_to get {x y z}] 0 ]
+                if { [ vecdist $xyz $xyz_to ] < $max_length } {
+                    lappend bonds_new $j
+                }
+            }
+            $bead setbonds [ list $bonds_new ]
+        }
+    }
+} 
+
+#############################################################
+#       		USE: get_cell 3          					#
+#				where the desired molecule is the top one	#
+#############################################################
+
+proc get_cell {{molid top}} {
+ set all [atomselect $molid all]
+ set minmax [measure minmax $all]
+ set vec [vecsub [lindex $minmax 1] [lindex $minmax 0]]
+ puts "cellBasisVector1 [lindex $vec 0] 0 0"
+ puts "cellBasisVector2 0 [lindex $vec 1] 0"
+ puts "cellBasisVector3 0 0 [lindex $vec 2]"
+ set center [measure center $all]
+ puts "cellOrigin $center"
+ $all delete
+} 
+
+lappend auto_path C:/uni/PhD/orientPlane/orient
+lappend auto_path C:/uni/PhD/orientPlane/la1.0
+# orient and la1.0 downloaded from:
+# http://www.ks.uiuc.edu/Research/vmd/script_library/scripts/orient/
+
+
+
+#############################################################
+#       		USE: orient_mol          					#
+#############################################################
+
+proc orient_mol {{nmol}} {
+  package require Orient
+  namespace import Orient::orient
+
+  set sel [atomselect $nmol all]
+  set I [draw principalaxes $sel]		
+  set A [orient $sel [lindex $I 2] {1 0 0}]	
+  $sel move $A 
+  set I [draw principalaxes $sel]		
+  set A [orient $sel [lindex $I 1] {0 1 0}]	
+  $sel move $A
+  set I [draw principalaxes $sel]		  
+  }
+  
+  
+  #############################################################
+#       		USE: orient_sel        					#
+#############################################################
+
+proc orient_sel {nmol sel } {
+  package require Orient
+  namespace import Orient::orient
+
+  #set sel [atomselect $nmol $atoms]
+  set I [draw principalaxes $sel]		
+  set A [orient $sel [lindex $I 2] {1 0 0}]	
+  set mol [atomselect $nmol all]
+  $mol move $A 
+  set I [draw principalaxes $sel]		
+  set A [orient $sel [lindex $I 1] {0 1 0}]	
+  $mol move $A
+  set I [draw principalaxes $sel]		  
+  }
+  
+  #############################################################
+#       		USE: coord_axes 0           					#
+#############################################################
+
+proc coord_axes {{nmol}} {
+  package require Orient
+  namespace import Orient::orient
+
+  set sel [atomselect $nmol all]
+  set I [draw principalaxes $sel]		
+  }
+  
+#############################################################
+#       		USE: label_atoms 3							#
+#				where 3 is the index of the molecule		#
+#############################################################
+
+proc label_atoms {{mid}} {
+   set all [atomselect $mid "all"]
+   foreach atom [$all list] {|
+   label add Atoms $molid/$atom
+   }
+   $all delete 
+}
+
+#############################################################
+#       		USE: arrow  {0 0 0 } {0 0 -1}	2						#
+#				give two vectors as parameters		#
+#############################################################
+
+proc arrow {start ending scaling} {
+    # an arrow is made of a cylinder and a cone
+    set end [ vecscale $scaling $ending]
+	set middle [vecadd $start [vecscale 0.8 [vecsub $end $start]]]
+    draw cylinder $start $middle radius [ expr 0.08*$scaling]
+    draw cone $middle $end radius [ expr 0.15*$scaling ]
+}
+
+#############################################################
+#       		USE:  rotateX x 90 0						#
+#############################################################
+
+proc rotate_mol {axis angle idx} {
+set sel [atomselect $idx all]
+set matrix [transaxis $axis $angle ]
+$sel move $matrix
+}
+
+#    $sel moveby { 0 0 1}
+
+
+#############################################################
+#			set sel [atomselect top "index 11 to 14"]
+#			rotate_bond $sel 2 11 -30 0
+#############################################################
+
+# Rotate selection $sel $angle degrees around the bond through
+# atoms $ind1 and $ind2
+proc rotate_bond { sel ind1 ind2 angle {molid top}} {
+    set a1 [atomselect $molid "index $ind1"]
+    set a2 [atomselect $molid "index $ind2"]
+    set c1 [lindex [$a1 get {x y z}] 0]
+    set c2 [lindex [$a2 get {x y z}] 0]
+    # compute rotation matrix
+    set rot_mat [trans bond $c1 $c2 $angle deg]
+
+    # rotate selection
+    $sel move $rot_mat
+} 

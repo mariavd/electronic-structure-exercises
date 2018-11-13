@@ -1,0 +1,19 @@
+More about VMD:
+--------------------
+Visualising materials properly: 
+Display -> Rendermode -> GLSL
+
+Try changing the lights (Display -> Light0, Light1, ...)
+
+
+Example material combinations for molecules:
+AOEdgy, Lights 0 and 3
+
+
+
+
+
+Highlighting atoms or groups:
+------------------------------
+Create Rep
+Selected Atoms: element c, index 3 to 7, 
