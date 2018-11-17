@@ -1,0 +1,8 @@
+# SLURM
+
+alias sub='sbatch script'
+alias sube='sbatch --exclusive script'
+#alias qu='squeue --sort "S" -u mariavd -o "%i %.13j %.20S  %.20e   %11L  %6D %C %.11m  %.8Q  %.P"'
+alias qu='squeue --sort "S" -u mariavd -o "%i %.20j %.20S %.20e     %10L     %6D   %C %.11m    %.8Q    %P"'
+
+

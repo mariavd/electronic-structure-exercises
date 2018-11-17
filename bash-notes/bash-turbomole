@@ -1,0 +1,10 @@
+# TURBOMOLE
+
+alias turbo='module load turbomole'
+alias gr="grep cycle gradient | tail -n 20"
+alias scf="grep cycle gradient > cycles.dat && gnuplot -e 'plot \"cycles.dat\" u 3:10 w l; pause -1'"
+alias tmclean="rm -f slave* *~ hp_mpi_appfile  master turbomole.machines jobfile* core* GEO_OPT_RUNNING hessapprox nextstep not.converged optinfo dscf* mpshift*"
+alias tmcleanall="rm -f MPI-TEMPDIR* slave* *~ hp_mpi_appfile  master turbomole.machines mos basis energy core* GEO_OPT_RUNNING GEO_OPT_FAILED hessapprox nextstep not.converged optinfo restart* statistics* auxbasis df* job* dd* oldfock* err* gradient low* control.* alpha beta server.output   "
+alias xc="/proj/group/compchem/TURBOMOLE-7.3.1/scripts/x2t coord > coord.xyz && xmakemol -f coord.xyz &"
+
+

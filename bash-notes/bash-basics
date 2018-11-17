@@ -1,0 +1,42 @@
+# User specific aliases and functions
+
+# These are typically part of the .bashrc. Add them if missing
+
+alias grep="grep --color=always"
+alias ls='ls --color'
+LS_COLORS='di=1;94'
+export LS_COLORS
+
+# Some commonly used aliases
+
+alias ll='ls -ltrh' # all information about the files ordered by modification time
+alias lx='ls -X' # sort by extension
+alias lsf='ls -p | grep -v / '
+ls -p | grep -v / # list files but not directories
+
+# going several levels up 
+alias ..='cd ..'
+alias ...='cd ../..'
+alias .3='cd ../../..'
+alias .4='cd ../../../../'
+alias .5='cd ../../../../../'
+
+
+# My own preferences 
+alias bsh='vim ~/.bashrc'
+alias sbsh='source ~/.bashrc'
+
+alias history='history | less'
+
+# A bash function can take arguments. Here we can give it the name of a
+# compressed .tar.gz archive and it will extract the files to a subdirectory
+
+function untar() {
+    name="$@" &&
+    dirname=${name/.*/} &&
+    mkdir $dirname &&
+    tar xzvf $name --directory $dirname;
+}
+
+
+
