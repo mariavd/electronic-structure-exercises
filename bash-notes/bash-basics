@@ -11,8 +11,7 @@ export LS_COLORS
 
 alias ll='ls -ltrh' # all information about the files ordered by modification time
 alias lx='ls -X' # sort by extension
-alias lsf='ls -p | grep -v / '
-ls -p | grep -v / # list files but not directories
+alias lsf='ls -p | grep -v / '  # list files but not directories
 
 # going several levels up 
 alias ..='cd ..'
