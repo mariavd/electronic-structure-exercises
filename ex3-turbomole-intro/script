@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=test                  // Job name to be displayed in queue
 ##SBATCH --workdir=<Workir path>                // This defines the Slurm working directory
-#SBATCH --output=foobar.out              // Job output at the completion
+#SBATCH --output=jobfile.out%J              // Job output at the completion
 #SBATCH -p test                          // Request test partition
 #SBATCH -c 1                             // Request single core
-#SBATCH -e foobar.err                    // Define error file
+#SBATCH -e jobfile.err%J                    // Define error file
 ##SBATCH --mail-type=END                  // Defining END of job mail notification
 ##SBATCH --mail-user=user@address.mail    // mail recipient
 SDIR=`pwd`
@@ -16,8 +16,9 @@ SDIR=`pwd`
 #export PARA_ARCH=MPI
 export PARA_ARCH=SMP
 export PARNODES=$SLURM_NPROCS
-export TURBODIR=/proj/group/compchem/TURBOMOLE-7.3.1
-export PATH=$TURBODIR/bin/`$TURBODIR/scripts/sysname`:$PATH
+export TURBODIR=/proj/group/compchem/bin/TURBOMOLE-7.3.1
+export PATH=$TURBODIR/scripts:$PATH
+export PATH=$TURBODIR/bin/em64t-unknown-linux-gnu:$PATH
 
 export TMPDIR=/wrk/group/compchem/tmp
 export TURBOTMPDIR=/$TMPDIR/$SLURM_JOB_ID/turbotmpdir
