@@ -1,13 +1,23 @@
 # User specific aliases and functions
 
-# These are typically part of the .bashrc. Add them if missing
+# These are typically part of the .bashrc
 
-alias grep="grep --color=always"
-alias ls='ls --color'
-LS_COLORS='di=1;94'
-export LS_COLORS
+# bash history, i.e. pressing the up arrow in the terminal shows the previously used commands
+# don't put duplicate lines or lines starting with space in the history. 
+# See bash(1) for more options   
+HISTCONTROL=ignoreboth
 
-# Some commonly used aliases
+# append to the history file, don't overwrite it       
+shopt -s histappend      
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1) 
+HISTSIZE=2000 
+HISTFILESIZE=3000                                      
+
+
+
+
+# Some commonly used aliases. They could instead go to ~/.bash_aliases (in practice the effect is the same)
 
 alias ll='ls -ltrh' # all information about the files ordered by modification time
 alias lx='ls -X' # sort by extension
@@ -19,6 +29,14 @@ alias ...='cd ../..'
 alias .3='cd ../../..'
 alias .4='cd ../../../../'
 alias .5='cd ../../../../../'
+
+
+
+# On clusters the work directory is often not your home directory.
+# Usually admins have defined a $WRKDIR for every user
+# It is handy to go to it easily since you will be doing your calculations there
+alias cdw='cd $WRKDIR' 
+
 
 
 # My own preferences 
