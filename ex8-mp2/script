@@ -1,0 +1,53 @@
+#!/bin/bash
+###
+### Lines starting with a hash and SBATCH are commands: #SBATCH
+### Lines with more than one hash sign in front of SBATCH are disabled
+###
+#SBATCH --job-name=turbomole             # Job name to be displayed in queue
+##SBATCH --workdir=<Workir path>               #// This defines the Slurm working directory
+#SBATCH -p short                         #/ Request test partition
+#SBATCH -c 8                             #/ Request single core
+##SBATCH --mail-type=END                  #/ Defining END of job mail notification
+##SBATCH --mail-user=user@address.mail    #/ mail recipient
+#SBATCH -e jobfile.err%J
+#SBATCH -o jobfile.out%J
+#SBATCH --mem=1000
+
+SDIR=`pwd`
+
+# Choosing MPI vs SMP paralellization (keep it SMP for now)
+# MPI can use more than one node of CPUs (this is for huge jobs)
+# SMP is used on one node only
+# Turbomole developers generally recommend SMP
+#export PARA_ARCH=MPI
+export PARA_ARCH=SMP
+
+# Parameters required by Turbomole - do not touch
+export PARNODES=$SLURM_CPUS_PER_TASK
+#export PARNODES=$SLURM_NPROCS
+export TURBODIR=/wrk/group/compchem/bin/TURBOMOLE-7.3.1
+export PATH=$TURBODIR/scripts:$PATH
+export PATH=$TURBODIR/bin/$(sysname):$PATH
+export TMPDIR=/wrk/group/compchem/tmp
+export TURBOTMPDIR=/$TMPDIR/$SLURM_JOB_ID/turbotmpdir
+
+# remove possible earlier $tmpdir from control file
+kdg tmpdir
+
+# If the previous job crashed, it leaves the $actual keyword in the control file.
+# Incomplete previous steps are not allowed to continue
+# You need to manually delete the "error" flag $actual using actual -r
+# It can be automated here with:
+#actual -r
+
+# The actual calculations are started here
+#/usr/bin/time -v  dscf > dscf.out
+#/usr/bin/time -v  ridft > ridft.out
+#/usr/bin/time -v jobex -ri -c 500 > jobex.out
+mpshift > mpshift.out
+#ccsdf12 > ccsdf12.out
+#/usr/bin/time -v  ricc2 > ricc2.out
+
+# print some info like used time, disk, reserved memory and actual used memory
+sacct -a --format=elapsed,maxdiskwrite,reqmem,maxrss  -j $SLURM_JOB_ID
+
