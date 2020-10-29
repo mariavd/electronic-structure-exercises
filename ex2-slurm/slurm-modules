@@ -1,0 +1,19 @@
+#!/bin/bash -l
+#SBATCH -p test    # the name of the pool
+#SBATCH --nodes 1        # "motherboards" with CPUs
+#SBATCH --ntasks 1      # total number of cores (processes)
+#SBATCH -t 00:02:00        # time as hh:mm:ss
+#SBATCH -J title     
+#SBATCH -e jobfile.err%J
+#SBATCH -o jobfile.out%J
+#SBATCH --mem-per-cpu=100
+#SBATCH --workdir=/wrk/users/username # REPLACE WITH YOUR USERNAME!!
+#SBATCH --mail-type=END
+#SBATCH --mail-user=your-email           
+
+module use /proj/group/compchem/Modules
+
+module load gnuplot
+
+echo $(which gnuplot)
+
