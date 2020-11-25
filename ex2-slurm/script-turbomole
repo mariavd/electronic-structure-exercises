@@ -1,0 +1,53 @@
+#!/bin/bash
+#SBATCH --job-name=benzoic-acid         
+#SBATCH -p test                        
+#SBATCH -t 10:00 
+#SBATCH --nodes 1        # "motherboards" with CPUs
+#SBATCH --ntasks 16      # total number of cores (processes)
+#SBATCH -e jobfile.err%J
+#SBATCH -o jobfile.out%J
+#SBATCH --mem-per-cpu=500
+##SBATCH --mail-type=END
+##SBATCH --mail-user=your-email           
+
+SDIR=`pwd`
+
+export OMP_NUM_THREADS=$SLURM_NTASKS
+
+module use /proj/group/compchem/Modules
+module load turbomole
+
+# Choosing MPI vs SMP paralellization (keep it SMP for now)
+# MPI can use more than one node of CPUs (this is for huge jobs)
+# SMP is used on one node only
+# Turbomole developers generally recommend SMP
+#export PARA_ARCH=MPI
+export PARA_ARCH=SMP
+
+
+# Parameters required by Turbomole - do not touch
+export PARNODES=$OMP_NUM_THREADS
+echo parnodes: $PARNODES
+export TMPDIR=/wrk/group/compchem/tmp
+export TURBOTMPDIR=/$TMPDIR/$SLURM_JOB_ID/turbotmpdir
+
+
+# remove possible earlier $tmpdir from control file
+kdg tmpdir
+
+# If the previous job crashed, it leaves the $actual keyword in the control file.
+# Incomplete previous steps are not allowed to continue
+# You need to manually delete the "error" flag $actual using actual -r
+# It can be automated here with:
+actual -r
+
+# The actual calculations are started here
+#dscf > dscf.out
+ridft > ridft.out
+jobex -ri -level cc2 -c 500 > jobex.out
+#aoforce > aoforce.out
+#/usr/bin/time -v  ricc2 > ricc2.out
+
+# print some info like used time, disk, reserved memory and actual used memory
+sacct -a --format=elapsed,maxdiskwrite,reqmem,maxrss  -j $SLURM_JOB_ID
+
